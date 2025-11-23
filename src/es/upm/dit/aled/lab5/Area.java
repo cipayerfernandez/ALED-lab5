@@ -45,6 +45,8 @@ public class Area {
 		this.capacity = capacity;
 		this.position = position;
 		this.color = Color.GRAY; // Default color
+		this.numPatients = 0;
+		this.waiting = 0;
 	}
 
 	/**
@@ -97,23 +99,25 @@ public class Area {
 		try {
 			// Región crítica: si la Area está llena y p tiene que esperar.
 			while (numPatients >= capacity) {
-				waiting++;
-				System.out.println("El nido está lleno. El águila" + p + "tiene que esperar");
+				this.waiting++;
+				System.out.println("El nido está lleno. El águila " + p + " tiene que esperar");
 				wait();
 			}
 			// Cuando Area no está llena, el paciente entra
-			waiting--;
-			numPatients++;
-			System.out.println("El águila" + p + "está en el nido");
+			this.numPatients++;
+			this.waiting--;
+			System.out.println("El águila " + p + " está en el nido");
 		} catch (InterruptedException e) {
 			System.out.println("Thread interrupted.");
+			Thread.currentThread().interrupt();
 		}
 	}
 
 	public synchronized void exit(Patient p) {
-		numPatients--;
+		this.numPatients--;
+		System.out.println("El águila " + p + " ha salido del nido");
 		notifyAll();
-		System.out.println("El águila" + p + "ha salido del nido");
+		
 	}
 
 	public synchronized int getCapacity() {
@@ -130,7 +134,10 @@ public class Area {
 	 * 
 	 * @return The number of Patients waiting to be treated.
 	 */
-	// TODO method getWaiting
+
+	public synchronized int getWaiting() {
+		return this.waiting;
+	}
 
 	@Override
 	public int hashCode() {

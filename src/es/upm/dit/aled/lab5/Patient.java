@@ -165,6 +165,26 @@ public class Patient extends Thread {
 	@Override
 	public void run() {
 		// TODO
+
+		// Los pasos 1-4 se darán mientras no se haya llegado al último paso (Transfer)
+		// del protocolo:
+
+		while (indexProtocol < protocol.size()) {
+			// 1. El paciente intenta acceder a la location. Si está llena, espera. Si no
+			// está llena, entra. El método enter() se llama sobre la location en la que
+			// está el paciente (this)
+			this.location.enter(this);
+			// 2. Es atendido en la location, esperando el tiempo que marque
+			// attendedAtLocation().
+			attendedAtLocation();
+			// 3. Sale de la location una vez ha sido atendido.
+			this.location.exit(this);
+			// 4. Avanza al siguiente paso del protocolo
+			advanceProtocol();
+		}
+		// Cuando llega al final del protocolo, se quita al paciente del GUI:
+		EmergencyRoomGUI.getInstance().removePatient(this);
+		System.out.println("El águila " + this.number + " ha finalizado su protocolo en " + this.location);
 	}
 
 }
